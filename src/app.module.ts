@@ -7,6 +7,7 @@ import { BookmarkModule } from './bookmark/bookmark.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SourceModule } from './source/source.module';
+import { AuthorizationModule } from './authorization/authorization.module';
 
 require('dotenv').config();
 const MONGO_URL = process.env.MONGO_DB_URL;
@@ -20,6 +21,7 @@ const MONGO_URL = process.env.MONGO_DB_URL;
     PrismaModule,
     MongooseModule.forRoot(MONGO_URL),
     SourceModule,
+    AuthorizationModule,
   ],
 })
 export class AppModule {}

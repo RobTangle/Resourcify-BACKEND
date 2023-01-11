@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { SourceService } from './source.service';
 import { CreateSourceDto } from './dto/create-source.dto';
 import { UpdateSourceDto } from './dto/update-source.dto';
+import { AuthorizationGuard } from 'src/authorization/authorization.guard';
 
 @Controller('source')
 export class SourceController {
@@ -25,6 +27,7 @@ export class SourceController {
     return this.sourceService.findAll();
   }
 
+  @UseGuards(AuthorizationGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.sourceService.findOne(id);
