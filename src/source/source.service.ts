@@ -22,7 +22,7 @@ export class SourceService {
   }
 
   findAll() {
-    return this.sourceModel.find({});
+    return this.sourceModel.find({}).exec();
     // return `This action returns all source`;
   }
 
@@ -31,7 +31,7 @@ export class SourceService {
     return `This action returns a #${id} source`;
   }
 
-  update(id: number, updateSourceDto: UpdateSourceDto) {
+  update(id: string, updateSourceDto: UpdateSourceDto) {
     return `This action updates a #${id} source`;
   }
 

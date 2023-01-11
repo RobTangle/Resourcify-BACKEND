@@ -32,7 +32,7 @@ export class SourceController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSourceDto: UpdateSourceDto) {
-    return this.sourceService.update(+id, updateSourceDto);
+    return this.sourceService.update(id, updateSourceDto);
   }
 
   @Delete(':id')
