@@ -8,12 +8,13 @@ import { expressJwtSecret } from 'jwks-rsa';
 import { promisify } from 'util';
 // import * as jwt from 'express-jwt';
 const { expressjwt: jwt } = require('express-jwt');
+// import { expressjwt, GetVerificationKey } from 'express-jwt';
 console.log(jwt);
 
 import { ConfigService } from '@nestjs/config'; // creo que es al dope importante ya que está seteado como global en app.module.ts
 
 @Injectable()
-export class AuthorizationGuard implements CanActivate {
+export class Auth0Guard implements CanActivate {
   private AUTH0_AUDIENCE: string;
   private AUTH0_DOMAIN: string;
 

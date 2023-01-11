@@ -11,7 +11,7 @@ import {
 import { SourceService } from './source.service';
 import { CreateSourceDto } from './dto/create-source.dto';
 import { UpdateSourceDto } from './dto/update-source.dto';
-import { AuthorizationGuard } from 'src/authorization/authorization.guard';
+import { Auth0Guard } from 'src/auth0/auth0.guard';
 
 @Controller('source')
 export class SourceController {
@@ -27,7 +27,7 @@ export class SourceController {
     return this.sourceService.findAll();
   }
 
-  @UseGuards(AuthorizationGuard)
+  @UseGuards(Auth0Guard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.sourceService.findOne(id);
