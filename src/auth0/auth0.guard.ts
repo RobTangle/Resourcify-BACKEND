@@ -6,11 +6,7 @@ import {
 } from '@nestjs/common';
 import { expressJwtSecret } from 'jwks-rsa';
 import { promisify } from 'util';
-// import * as jwt from 'express-jwt';
 const { expressjwt: jwt } = require('express-jwt');
-// import { expressjwt, GetVerificationKey } from 'express-jwt';
-console.log(jwt);
-
 import { ConfigService } from '@nestjs/config'; // creo que es al dope importante ya que está seteado como global en app.module.ts
 
 @Injectable()
@@ -41,6 +37,7 @@ export class Auth0Guard implements CanActivate {
     );
     try {
       await checkJwt(req, res);
+      console.log('Auth0Guard. REQ.AUTH = ', req.auth);
       return true;
     } catch (error) {
       throw new UnauthorizedException(error);

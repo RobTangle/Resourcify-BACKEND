@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type SourceDocument = HydratedDocument<Source>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Source {
   @Prop({ required: true })
   title: string;
@@ -21,7 +21,7 @@ export class Source {
   order: number;
 
   @Prop({ required: true })
-  user_id: string;
+  user_sub: string;
 }
 
 export const SourceSchema = SchemaFactory.createForClass(Source);
