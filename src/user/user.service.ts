@@ -32,7 +32,7 @@ export class UserService {
       });
       console.log('NUEVO USUARIO CREADO! ', newUser);
 
-      return { user: newUser, newUser: true };
+      return { ...newUser, isNewUser: true };
     }
   }
 
