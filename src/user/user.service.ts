@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { LeanDocument, Model } from 'mongoose';
+import { Source } from 'src/source/schema/source.schema';
+import { ReqAuthDto, CreateUserDto } from './dto';
 // import { PrismaService } from '../prisma/prisma.service';
 // import { EditUserDto } from './dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schema/user.schema';
 
 @Injectable()
@@ -18,21 +19,42 @@ export class UserService {
     return newUser;
   }
 
-  async findOrCreateUser(sub: string, email: string) {
-    const userFound = await this.userModel
-      .findOne({ sub: sub }, {}, { sanitizeFilter: true })
-      .exec();
-    if (userFound) {
-      console.log('USUARIO ENCONTRADO = ', userFound);
-      return { user: userFound, newUser: false };
-    } else {
-      const newUser = await this.userModel.create({
-        sub,
-        email,
+  // GET USER WITH SOURCES GROUPED BY CATEGORIES :
+  async getUserWithGroupedDocs(reqAuth: ReqAuthDto) {
+    const user = await this.findOrCreateUserAndReturnItLean(reqAuth);
+    const documentsArray = user.resources;
+    const groupByCategory = (documentsArray: LeanDocument<Source>[]) => {
+      const categories = {};
+      documentsArray.forEach((doc) => {
+        const category = doc.category;
+        if (!categories[category]) {
+          categories[category] = [];
+        }
+        categories[category].push(doc);
       });
-      console.log('NUEVO USUARIO CREADO! ', newUser);
+      return categories;
+    };
+    const groupedDocs = groupByCategory(documentsArray);
+    return { ...user, groupedDocs };
+  }
 
-      return { ...newUser, isNewUser: true };
+  // FIND OR CREATE USER AND RETURN IT LEAN :
+  private async findOrCreateUserAndReturnItLean(reqAuth: ReqAuthDto) {
+    const userInDB = await this.userModel
+      .findOne({ email: reqAuth.email }, {}, { sanitizeFilter: true })
+      .lean()
+      .exec();
+    if (userInDB) {
+      console.log('El usuario existe. Retornandolo...');
+      return userInDB;
+    } else {
+      console.log('Usuario no existe. Creando uno nuevo y retornandolo...');
+      await this.userModel.create({ email: reqAuth.email, sub: reqAuth.sub });
+      const newUserFetched = await this.userModel
+        .findOne({ email: reqAuth.email, sub: reqAuth.email })
+        .lean()
+        .exec();
+      return { ...newUserFetched, isNewUser: true };
     }
   }
 
@@ -46,6 +68,50 @@ export class UserService {
       return { msg: false };
     }
   }
+
+  // async findUserAndGroupDocs(sub: string, email: string) {
+  //   const userFound = await this.userModel
+  //     .findOne({ sub: sub }, {}, { sanitizeFilter: true })
+  //     .lean()
+  //     .exec();
+  //   if (!userFound) return { msg: 'user not found' };
+
+  //   // función para crear objecto con documentos separados por categorías:
+  //   const documentsArray = userFound.resources;
+  //   const groupByCategory = (documentsArray: LeanDocument<Source>[]) => {
+  //     const categories = {};
+  //     documentsArray.forEach((doc) => {
+  //       const category = doc.category;
+  //       if (!categories[category]) {
+  //         categories[category] = [];
+  //       }
+  //       categories[category].push(doc);
+  //     });
+  //     return categories;
+  //   };
+
+  //   const groupedDocs = groupByCategory(documentsArray);
+  //   console.log(groupedDocs);
+  //   return { ...userFound, groupedDocs };
+  // }
+
+  // async findOrCreateUser(sub: string, email: string) {
+  //   const userFound = await this.userModel
+  //     .findOne({ email: email }, {}, { sanitizeFilter: true })
+  //     .exec();
+  //   if (userFound) {
+  //     console.log('USUARIO ENCONTRADO = ', userFound);
+  //     return { user: userFound, newUser: false };
+  //   } else {
+  //     const newUser = await this.userModel.create({
+  //       sub,
+  //       email,
+  //     });
+  //     console.log('NUEVO USUARIO CREADO! ', newUser);
+
+  //     return { ...newUser, isNewUser: true };
+  //   }
+  // }
 
   // async editUser(userId: string, dto: EditUserDto) {
   //   const user = await this.prisma.user.update({

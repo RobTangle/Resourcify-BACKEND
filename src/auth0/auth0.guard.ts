@@ -37,7 +37,6 @@ export class Auth0Guard implements CanActivate {
     );
     try {
       await checkJwt(req, res);
-      console.log('Auth0Guard. REQ.AUTH = ', req.auth);
       return true;
     } catch (error) {
       throw new UnauthorizedException(error);

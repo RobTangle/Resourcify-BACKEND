@@ -8,11 +8,9 @@ export const GetAuthInfo = createParamDecorator(
       return null;
     }
     if (data) {
-      console.log('DATA EXISTE = ', data);
       console.log('REQUEST.auth[data] = ', request.auth[data]);
       return request.auth[data];
     }
-    console.log('REQUEST.auth = ', request.auth);
     return request.auth;
   },
 );
