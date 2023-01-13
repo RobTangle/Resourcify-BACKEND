@@ -48,8 +48,6 @@ export class SourceController {
 
   @Get(':id')
   findOneById(@GetAuthInfo() reqAuth: ReqAuthDto, @Param('id') id: string) {
-    console.log('REQ.AUTH!!!!! = ', reqAuth);
-    // const reqAuth = req.auth;
     return this.sourceService.findOneById(id, reqAuth);
   }
 

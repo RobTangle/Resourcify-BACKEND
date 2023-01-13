@@ -22,7 +22,7 @@ export const GetAuthInfo = createParamDecorator(
       console.log('REQUEST.auth[data] = ', request.auth[data]);
       return request.auth[data];
     }
-    console.log('REQUEST.auth = ', request.auth);
+    // console.log('REQUEST.auth = ', request.auth);
     return request.auth;
   },
 );
