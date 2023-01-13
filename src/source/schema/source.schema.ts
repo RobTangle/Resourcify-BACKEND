@@ -20,6 +20,9 @@ export class Source {
   @Prop({ required: false })
   order: number;
 
+  @Prop({ required: false })
+  is_favourite: boolean;
+
   @Prop({ required: true })
   user_sub: string;
 }
