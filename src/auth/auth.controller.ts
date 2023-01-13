@@ -22,7 +22,7 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   async callback(@Req() req, @Res() res) {
-    console.log('REQ.USER = ', req.user);
+    // console.log('REQ.USER = ', req.user);
     // const jwt = await this.authService.login(req.user);
     // res.set('authorization', jwt.access_token);
     // return res.json(req.user);

@@ -17,7 +17,7 @@ export class CreateSourceDto {
 
   @IsString()
   @IsOptional()
-  @Length(1, 300)
+  @Length(0, 300)
   description?: string;
 
   @IsString()
