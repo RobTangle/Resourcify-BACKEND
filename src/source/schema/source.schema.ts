@@ -11,6 +11,9 @@ export class Source {
   @Prop({ required: false })
   description: string;
 
+  @Prop({ required: true })
+  link: string;
+
   @Prop({ required: true, lowercase: true })
   category: string;
 
