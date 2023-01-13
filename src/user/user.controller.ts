@@ -1,15 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  Req,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-// import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+
 import { User } from '@prisma/client';
-// import { Request } from 'express';
+
 import { GetAuthInfo, GetUser } from '../auth/decorator';
 // import { JwtGuard } from '../auth/guard';
 import { Auth0Guard } from '../auth0/auth0.guard';
@@ -29,12 +21,9 @@ export class UserController {
   //   return user;
   // }
 
-  @Get('userInfo')
-  async getUserInfo(@GetAuthInfo() reqAuth: ReqAuthDto) {
-    const response = await this.userService.findOrCreateUser(
-      reqAuth.sub,
-      reqAuth.email,
-    );
+  @Get('userinfo')
+  async getOrAndCreateUser(@GetAuthInfo() reqAuth: ReqAuthDto) {
+    const response = await this.userService.getUserWithGroupedDocs(reqAuth);
     return response;
   }
 
