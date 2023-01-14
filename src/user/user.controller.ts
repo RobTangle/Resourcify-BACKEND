@@ -26,7 +26,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   // CREATE NEW USER :
-  @Post('newUser')
+  @Post('')
   @ApiOperation({
     summary:
       'It creates a new User in the data base based on the JWT token sent in the request.',
@@ -41,7 +41,7 @@ export class UserController {
   }
 
   // GET USER FROM THE DB :
-  @Get('user')
+  @Get('')
   @ApiOperation({
     summary:
       'Find the User in the database and returns the user doc + groupedDocs object.',
