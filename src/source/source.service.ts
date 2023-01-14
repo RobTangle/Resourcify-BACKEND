@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { parseResponseObj } from 'src/helpers/parse-response-obj.helper';
@@ -23,7 +27,9 @@ export class SourceService {
       .exec();
 
     if (!userInDB) {
-      return { error: "User doesn't exist in the database" };
+      throw new ForbiddenException(
+        'Must be registered user to create a new resource.',
+      );
     }
     // crear recurso, y pushearlo adentro del userInDB
     const completedObj = {
@@ -46,7 +52,7 @@ export class SourceService {
     if (sourceFound) {
       return sourceFound;
     } else {
-      return { error: 'Resource not found' };
+      throw new NotFoundException('Resource not found.');
     }
   }
 
@@ -70,7 +76,7 @@ export class SourceService {
       })
       .exec();
     if (!sourceDoc) {
-      return { error: `Document with id ${source_id}not found.` };
+      throw new NotFoundException('Resource not found');
     }
 
     // update the Source document and the User.resources doc:
@@ -82,12 +88,13 @@ export class SourceService {
       )
       .exec();
     if (!userOwner) {
-      return { error: 'User not found' };
+      console.log('Usuario no encontrado en la base de datos');
+      throw new ForbiddenException();
     }
     //edit the subdoc in the User parent Document:
     const subDoc = userOwner.resources.id(source_id);
     if (!subDoc) {
-      return { error: 'subDoc es falso. No encontrado!' };
+      throw new NotFoundException();
     }
 
     //!Ver de usar otro método, por más de que este funcione bien. Seguir probando de hacer funcionar un método update()... Este de abajo funciona muy bien igualmente.
@@ -111,12 +118,16 @@ export class SourceService {
       user_sub: reqAuth.sub,
     });
     if (!deletedDoc) {
-      // return { error: 'Resource not found in the Source Collection' };
       console.log('No encontrado en source collection');
+      throw new NotFoundException();
     }
     // find and delete subdocument of the User.resources array:
     const userOwner = await this.userModel.findOne({ sub: reqAuth.sub });
-    userOwner.resources.id(id).remove();
+    const resourceToDelete = userOwner.resources.id(id);
+    if (!resourceToDelete) {
+      throw new NotFoundException();
+    }
+    resourceToDelete.remove();
     const userOwnerUpdated = await userOwner.save();
     return parseResponseObj(userOwnerUpdated);
   }
