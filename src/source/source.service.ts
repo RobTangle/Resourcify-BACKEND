@@ -112,23 +112,32 @@ export class SourceService {
 
   // REMOVES SOURCE FROM SOURCE COLLECTION AND USER RESOURCES subdocs :
   async remove(id: string, reqAuth: ReqAuthDto) {
+    // find and delete subdocument of the User.resources array:
+    const userOwner = await this.userModel.findOne({ sub: reqAuth.sub });
+    if (!userOwner) {
+      throw new ForbiddenException("User doesn't exist in the data base.");
+    }
+    const resourceToDelete = userOwner.resources.id(id);
+    if (!resourceToDelete) {
+      throw new NotFoundException('Document not found.');
+    }
+    resourceToDelete.remove();
+    const userOwnerUpdated = await userOwner.save();
+
     // find and delete document in the Source collection:
     const deletedDoc = await this.sourceModel.findOneAndDelete({
       _id: id,
       user_sub: reqAuth.sub,
     });
     if (!deletedDoc) {
-      console.log('No encontrado en source collection');
-      throw new NotFoundException();
+      console.log(
+        'ERROR/BUG: No encontrado en source collection, pero sí borrado del User.resources array!',
+      );
+      throw new NotFoundException(
+        'BUG: Document not found in the Source Collection.',
+      );
     }
-    // find and delete subdocument of the User.resources array:
-    const userOwner = await this.userModel.findOne({ sub: reqAuth.sub });
-    const resourceToDelete = userOwner.resources.id(id);
-    if (!resourceToDelete) {
-      throw new NotFoundException();
-    }
-    resourceToDelete.remove();
-    const userOwnerUpdated = await userOwner.save();
+
     return parseResponseObj(userOwnerUpdated);
   }
 }
