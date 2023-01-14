@@ -24,7 +24,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserParsedSwagger } from 'src/user/dto/user-parsed.dto';
+import { UserParsedSwagger } from 'src/user/dto/user-parsed-swagger.dto';
 
 @UseGuards(Auth0Guard)
 @Controller('source')
