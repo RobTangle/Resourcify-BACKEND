@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { SourceService } from './source.service';
 import { CreateSourceDto } from './dto/create-source.dto';
@@ -14,7 +16,15 @@ import { UpdateSourceDto } from './dto/update-source.dto';
 import { Auth0Guard } from 'src/auth0/auth0.guard';
 import { GetAuthInfo } from 'src/auth/decorator';
 import { ReqAuthDto } from 'src/user/dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { UserParsedSwagger } from 'src/user/dto/user-parsed-swagger.dto';
 
 @UseGuards(Auth0Guard)
 @Controller('source')
@@ -37,6 +47,14 @@ export class SourceController {
     description:
       'Creates a Source Document in the Source Collection and the User.resources array. It returns the Complete and Grouped User Object.',
   })
+  @ApiOkResponse({
+    type: UserParsedSwagger,
+    description: 'The user document + de groupedDocs object.',
+  })
+  @ApiForbiddenResponse({
+    description:
+      'Possible response if the User is not registered in the data base.',
+  })
   create(
     @GetAuthInfo() reqAuth: ReqAuthDto,
     @Body() createSourceDto: CreateSourceDto,
@@ -50,15 +68,30 @@ export class SourceController {
   }
 
   @Get(':id')
+  @ApiOkResponse()
+  @ApiNotFoundResponse({
+    description: 'Possible response if the document is not found.',
+  })
   findOneById(@GetAuthInfo() reqAuth: ReqAuthDto, @Param('id') id: string) {
     return this.sourceService.findOneById(id, reqAuth);
   }
 
   @Patch(':id')
+  @ApiOkResponse({
+    type: UserParsedSwagger,
+    description: 'The user document + de groupedDocs object.',
+  })
   @ApiOperation({
     summary: 'Update with update service from my own invention..',
     description:
       'Updates a Source Document from the Source Collection and the User.resources array. It returns the Complete and Grouped User Object.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Possible response if the document is not found.',
+  })
+  @ApiForbiddenResponse({
+    description:
+      'Possible response if the User is not registered in the data base.',
   })
   update(
     @GetAuthInfo() reqAuth: ReqAuthDto,
@@ -68,12 +101,24 @@ export class SourceController {
     return this.sourceService.update(reqAuth, source_id, updateSourceDto);
   }
 
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Delete Source',
     description:
       'Deletes a Source Document from the Source Collection and the User.resources array. It returns the Complete and Grouped User Object.',
   })
-  @Delete(':id')
+  @ApiOkResponse({
+    type: UserParsedSwagger,
+    description: 'The user document + de groupedDocs object.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Possible response if the document is not found.',
+  })
+  @ApiForbiddenResponse({
+    description:
+      'Possible response if the User is not registered in the data base.',
+  })
   remove(@Param('id') id: string, @GetAuthInfo() reqAuth: ReqAuthDto) {
     return this.sourceService.remove(id, reqAuth);
   }

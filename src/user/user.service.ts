@@ -1,18 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { LeanDocument, Model, Document } from 'mongoose';
-import { groupByCategory } from 'src/helpers/groupByCategory.helper';
-import { Source } from 'src/source/schema/source.schema';
+import { Model } from 'mongoose';
+import { parseResponseObj } from 'src/helpers/parse-response-obj.helper';
 import { ReqAuthDto, CreateUserDto } from './dto';
-// import { PrismaService } from '../prisma/prisma.service';
-// import { EditUserDto } from './dto';
 import { User, UserDocument } from './schema/user.schema';
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async create(createUserDto: CreateUserDto) {
+  // CREATE USER :
+  async createUser(createUserDto: CreateUserDto) {
     const completedObj = {
       ...createUserDto,
     };
@@ -20,34 +18,13 @@ export class UserService {
     return newUser;
   }
 
-  // GET USER WITH SOURCES GROUPED BY CATEGORIES :
-  async getUserWithGroupedDocs(reqAuth: ReqAuthDto) {
-    const user = await this.findOrCreateUserAndReturnItLean(reqAuth);
-    const documentsArray = user.resources;
-    const groupedDocs = groupByCategory(documentsArray);
-    return { ...user, groupedDocs };
+  // GET USER FROM THE DB + GROUPEDDOCS :
+  async getUserParsed(reqAuth: ReqAuthDto) {
+    const user = await this.returnUserFromDBOrThrowError(reqAuth);
+    return parseResponseObj(user);
   }
 
-  // FIND OR CREATE USER AND RETURN IT LEAN :
-  private async findOrCreateUserAndReturnItLean(reqAuth: ReqAuthDto) {
-    const userInDB = await this.userModel
-      .findOne({ email: reqAuth.email }, {}, { sanitizeFilter: true })
-      .lean()
-      .exec();
-    if (userInDB) {
-      console.log('El usuario existe. Retornandolo...');
-      return userInDB;
-    } else {
-      console.log('Usuario no existe. Creando uno nuevo y retornandolo...');
-      await this.userModel.create({ email: reqAuth.email, sub: reqAuth.sub });
-      const newUserFetched = await this.userModel
-        .findOne({ email: reqAuth.email, sub: reqAuth.email })
-        .lean()
-        .exec();
-      return { ...newUserFetched, isNewUser: true };
-    }
-  }
-
+  // USER EXISTS :
   async userExists(sub: string, email: string) {
     const userInDB = await this.userModel.exists({ email: email });
     if (userInDB) {
@@ -58,6 +35,49 @@ export class UserService {
       return { msg: false };
     }
   }
+
+  private async returnUserFromDBOrThrowError(reqAuth: ReqAuthDto) {
+    const user = await this.userModel
+      .findOne(
+        { sub: reqAuth.sub, email: reqAuth.email },
+        {},
+        { sanitizeFilter: true },
+      )
+      .exec();
+    if (!user) {
+      throw new NotFoundException('User not found in the data base');
+    } else {
+      return user;
+    }
+  }
+
+  // GET USER WITH SOURCES GROUPED BY CATEGORIES :
+  // async getOrAndCreateUserWithGroupedDocs(reqAuth: ReqAuthDto) {
+  //   const user = await this.findOrCreateUserAndReturnItLean(reqAuth);
+  //   const documentsArray = user.resources;
+  //   const groupedDocs = groupByCategory(documentsArray);
+  //   return { ...user, groupedDocs };
+  // }
+
+  // FIND OR CREATE USER AND RETURN IT LEAN :
+  // private async findOrCreateUserAndReturnItLean(reqAuth: ReqAuthDto) {
+  //   const userInDB = await this.userModel
+  //     .findOne({ email: reqAuth.email }, {}, { sanitizeFilter: true })
+  //     .lean()
+  //     .exec();
+  //   if (userInDB) {
+  //     console.log('El usuario existe. Retornandolo...');
+  //     return userInDB;
+  //   } else {
+  //     console.log('Usuario no existe. Creando uno nuevo y retornandolo...');
+  //     await this.userModel.create({ email: reqAuth.email, sub: reqAuth.sub });
+  //     const newUserFetched = await this.userModel
+  //       .findOne({ email: reqAuth.email, sub: reqAuth.email })
+  //       .lean()
+  //       .exec();
+  //     return { ...newUserFetched, isNewUser: true };
+  //   }
+  // }
 
   // async findUserAndGroupDocs(sub: string, email: string) {
   //   const userFound = await this.userModel
