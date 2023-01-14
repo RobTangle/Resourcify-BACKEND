@@ -5,12 +5,14 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
 import { GetAuthInfo } from '../auth/decorator';
 // import { JwtGuard } from '../auth/guard';
 import { Auth0Guard } from '../auth0/auth0.guard';
+import { NewUserDocSwagger } from './dto/new-user-doc.dto';
 import { ReqAuthDto } from './dto/req-auth.dto';
 import { UserParsedSwagger } from './dto/user-parsed-swagger.dto';
 import { UserService } from './user.service';
@@ -28,6 +30,11 @@ export class UserController {
   @ApiOperation({
     summary:
       'It creates a new User in the data base based on the JWT token sent in the request.',
+  })
+  @ApiResponse({
+    type: NewUserDocSwagger,
+    description: 'Responds with the new User Document.',
+    status: 201,
   })
   async createNewUser(@GetAuthInfo() reqAuth: ReqAuthDto) {
     return this.userService.createUser(reqAuth);
