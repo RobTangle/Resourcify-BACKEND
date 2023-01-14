@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { LeanDocument, Model } from 'mongoose';
+import { LeanDocument, Model, Document } from 'mongoose';
+import { groupByCategory } from 'src/helpers/groupByCategory.helper';
 import { Source } from 'src/source/schema/source.schema';
 import { ReqAuthDto, CreateUserDto } from './dto';
 // import { PrismaService } from '../prisma/prisma.service';
@@ -23,17 +24,6 @@ export class UserService {
   async getUserWithGroupedDocs(reqAuth: ReqAuthDto) {
     const user = await this.findOrCreateUserAndReturnItLean(reqAuth);
     const documentsArray = user.resources;
-    const groupByCategory = (documentsArray: LeanDocument<Source>[]) => {
-      const categories = {};
-      documentsArray.forEach((doc) => {
-        const category = doc.category;
-        if (!categories[category]) {
-          categories[category] = [];
-        }
-        categories[category].push(doc);
-      });
-      return categories;
-    };
     const groupedDocs = groupByCategory(documentsArray);
     return { ...user, groupedDocs };
   }

@@ -15,7 +15,7 @@ export class Source {
   description: string;
 
   @IsUrl()
-  @Prop({ required: true })
+  @Prop({ required: false })
   link: string;
 
   @IsString()

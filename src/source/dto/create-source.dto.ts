@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
@@ -13,33 +14,40 @@ export class CreateSourceDto {
   @IsString()
   @IsNotEmpty()
   @Length(1, 65)
-  title: string;
-
-  @IsString()
-  @IsOptional()
-  @Length(0, 300)
-  description?: string;
+  @ApiProperty()
+  readonly title: string;
 
   @IsString()
   @IsNotEmpty()
   @IsUrl()
-  link: string;
+  @ApiProperty()
+  readonly link: string;
 
   @IsString()
   @IsNotEmpty()
   @Length(1, 30)
   @IsOptional()
-  category: string;
+  @ApiProperty()
+  readonly category: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(0, 300)
+  @ApiPropertyOptional()
+  readonly description?: string;
 
   @IsNumber()
   @IsOptional()
-  order: number;
+  @ApiPropertyOptional()
+  readonly order: number;
 
   @IsBoolean()
   @IsOptional()
-  is_favourite: boolean;
+  @ApiPropertyOptional()
+  readonly is_favourite: boolean;
 
   @IsArray()
   @IsOptional()
-  keywords?: string[];
+  @ApiPropertyOptional()
+  readonly keywords?: string[];
 }
