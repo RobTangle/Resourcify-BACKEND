@@ -1,4 +1,8 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  BadRequestException,
+  createParamDecorator,
+  ExecutionContext,
+} from '@nestjs/common';
 import { Request as RequestJWT } from 'express-jwt';
 
 export const GetUser = createParamDecorator(
@@ -15,7 +19,7 @@ export const GetAuthInfo = createParamDecorator(
   (data: string | undefined, ctx: ExecutionContext) => {
     const request: RequestJWT = ctx.switchToHttp().getRequest();
     if (!request.auth) {
-      return null;
+      throw new BadRequestException('Missing auth property in Request object');
     }
     if (data) {
       console.log('DATA EXISTE = ', data);
