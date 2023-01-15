@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -100,7 +101,7 @@ export class SourceService {
     //!Ver de usar otro método, por más de que este funcione bien. Seguir probando de hacer funcionar un método update()... Este de abajo funciona muy bien igualmente.
     const propsToUpdate = Object.keys(updateSourceDto);
     if (!propsToUpdate.length) {
-      throw new Error('No keys passed to update.');
+      throw new BadRequestException('No keys passed to update.');
     }
     for (let i = 0; i < propsToUpdate.length; i++) {
       const element = propsToUpdate[i];
