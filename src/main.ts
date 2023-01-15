@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 const morgan = require('morgan');
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+const PORT = process.env.PORT || 3333;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -39,7 +40,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
-  await app.listen(3333);
+  await app.listen(PORT);
 }
 bootstrap();
 
