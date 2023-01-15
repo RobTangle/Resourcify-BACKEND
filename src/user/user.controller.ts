@@ -10,16 +10,14 @@ import {
 } from '@nestjs/swagger';
 
 import { GetAuthInfo } from '../auth/decorator';
-// import { JwtGuard } from '../auth/guard';
 import { Auth0Guard } from '../auth0/auth0.guard';
 import { NewUserDocSwagger } from './dto/new-user-doc.dto';
 import { ReqAuthDto } from './dto/req-auth.dto';
 import { UserParsedSwagger } from './dto/user-parsed-swagger.dto';
 import { UserService } from './user.service';
 
-// @UseGuards(JwtGuard)
 @UseGuards(Auth0Guard)
-@Controller('users')
+@Controller('user')
 @ApiBearerAuth('JWT-auth')
 @ApiTags('User')
 export class UserController {
