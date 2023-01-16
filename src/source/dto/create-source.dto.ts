@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -38,6 +39,18 @@ export class CreateSourceDto {
 
   @IsNumber()
   @IsOptional()
+  @Transform((val: any) => {
+    console.log('TRANSFORM VAL = ', val.value);
+    if (val) {
+      const parsedVal = +val.value;
+      if (Number.isNaN(parsedVal)) {
+        throw new Error('Order/Relevance must be a positive number');
+      }
+      return parsedVal;
+    } else {
+      return undefined;
+    }
+  })
   @ApiPropertyOptional()
   readonly order: number;
 
