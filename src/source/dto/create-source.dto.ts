@@ -6,15 +6,15 @@ import {
   IsOptional,
   IsArray,
   IsNumber,
-  Length,
   IsBoolean,
   IsUrl,
 } from 'class-validator';
+import { MaxLengthWithMessage } from '../decorators/';
 
 export class CreateSourceDto {
   @IsString()
   @IsNotEmpty()
-  @Length(1, 65)
+  @MaxLengthWithMessage(70)
   @ApiProperty()
   readonly title: string;
 
@@ -26,21 +26,20 @@ export class CreateSourceDto {
 
   @IsString()
   @IsNotEmpty()
-  @Length(1, 30)
+  @MaxLengthWithMessage(30)
   @IsOptional()
   @ApiProperty()
   readonly category: string;
 
   @IsString()
   @IsOptional()
-  @Length(0, 300)
+  @MaxLengthWithMessage(900)
   @ApiPropertyOptional()
   readonly description?: string;
 
   @IsNumber()
   @IsOptional()
   @Transform((val: any) => {
-    console.log('TRANSFORM VAL = ', val.value);
     if (val) {
       const parsedVal = +val.value;
       if (Number.isNaN(parsedVal)) {
@@ -48,7 +47,7 @@ export class CreateSourceDto {
       }
       return parsedVal;
     } else {
-      return undefined;
+      return 0;
     }
   })
   @ApiPropertyOptional()
