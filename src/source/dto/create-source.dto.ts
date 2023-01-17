@@ -8,6 +8,8 @@ import {
   IsNumber,
   IsBoolean,
   IsUrl,
+  Max,
+  Min,
 } from 'class-validator';
 import { MaxLengthWithMessage } from '../decorators/';
 
@@ -26,7 +28,7 @@ export class CreateSourceDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLengthWithMessage(30)
+  @MaxLengthWithMessage(35)
   @IsOptional()
   @ApiProperty()
   readonly category: string;
@@ -39,6 +41,8 @@ export class CreateSourceDto {
 
   @IsNumber()
   @IsOptional()
+  @Max(99)
+  @Min(0)
   @Transform((val: any) => {
     if (val) {
       const parsedVal = +val.value;
