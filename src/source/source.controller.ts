@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { SourceService } from './source.service';
 import { CreateSourceDto } from './dto/create-source.dto';
@@ -60,6 +61,15 @@ export class SourceController {
     @Body() createSourceDto: CreateSourceDto,
   ) {
     return this.sourceService.create(createSourceDto, reqAuth);
+  }
+
+  @Get('/link/')
+  @ApiOperation({
+    summary: 'Parses the url to get the title of the web page',
+  })
+  parseLink(@Query('link') url: string, @GetAuthInfo() reqAuth: ReqAuthDto) {
+    console.log('url en controller = ', url);
+    return this.sourceService.parseLink(url, reqAuth);
   }
 
   @Get()
