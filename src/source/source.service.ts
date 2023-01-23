@@ -12,6 +12,8 @@ import { User, UserDocument } from '../user/schema/user.schema';
 import { CreateSourceDto } from './dto/create-source.dto';
 import { UpdateSourceDto } from './dto/update-source.dto';
 import { Source, SourceDocument } from './schema/source.schema';
+import fetch from 'node-fetch';
+const validUrl = require('valid-url');
 
 @Injectable()
 export class SourceService {
@@ -140,5 +142,20 @@ export class SourceService {
     }
 
     return parseResponseObj(userOwnerUpdated);
+  }
+
+  // PARSE LINK :
+  async parseLink(url: string, reqAuth: ReqAuthDto) {
+    const userOwner = await this.userModel.exists({ sub: reqAuth.sub }).exec();
+    if (!userOwner) {
+      throw new ForbiddenException("User doesn't exist in the data base.");
+    }
+    const validatedUrl = validUrl.isUri(url);
+    if (!validatedUrl) {
+      throw new BadRequestException('Invalid URL provided');
+    }
+    const response = await fetch(validatedUrl);
+    const html = await response.text();
+    return { html: html };
   }
 }
