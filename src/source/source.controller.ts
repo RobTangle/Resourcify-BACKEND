@@ -72,10 +72,10 @@ export class SourceController {
     return this.sourceService.parseLink(url, reqAuth);
   }
 
-  @Get()
-  findAll() {
-    return this.sourceService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.sourceService.findAll();
+  // }
 
   @Get(':id')
   @ApiOkResponse()
