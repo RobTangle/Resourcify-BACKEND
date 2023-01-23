@@ -150,11 +150,11 @@ export class SourceService {
     if (!userOwner) {
       throw new ForbiddenException("User doesn't exist in the data base.");
     }
-    if (!validUrl.isUri(url)) {
+    const validatedUrl = validUrl.isUri(url);
+    if (!validatedUrl) {
       throw new BadRequestException('Invalid URL provided');
     }
-
-    const response = await fetch(url);
+    const response = await fetch(validatedUrl);
     const html = await response.text();
     return { html: html };
   }
