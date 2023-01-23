@@ -13,6 +13,7 @@ import { CreateSourceDto } from './dto/create-source.dto';
 import { UpdateSourceDto } from './dto/update-source.dto';
 import { Source, SourceDocument } from './schema/source.schema';
 import fetch from 'node-fetch';
+const validUrl = require('valid-url');
 
 @Injectable()
 export class SourceService {
@@ -149,7 +150,9 @@ export class SourceService {
     if (!userOwner) {
       throw new ForbiddenException("User doesn't exist in the data base.");
     }
-    console.log('url en service = ', url);
+    if (!validUrl.isUri(url)) {
+      throw new BadRequestException('Invalid URL provided');
+    }
 
     const response = await fetch(url);
     const html = await response.text();
