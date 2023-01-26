@@ -16,7 +16,7 @@ import { MaxLengthWithMessage } from '../decorators/';
 export class CreateSourceDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLengthWithMessage(70)
+  @MaxLengthWithMessage(120)
   @ApiProperty()
   readonly title: string;
 
